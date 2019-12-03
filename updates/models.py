@@ -1,9 +1,19 @@
+from django.core.serializers import serialize
 from django.conf import settings
 from django.db import models
 
 # Create your models here.
 def upload_update_image(instance, filename):
     return "updates/{user}/{filename}".format(user=instance.user, filename=filename)
+
+class UpdateQuerySet(models.QuerySet):
+    def serialize(self):
+        qs = self
+        return serialize('json', qs, fields=('user', 'content', 'image') )
+
+class UpdateManager(models.Manager):
+    def serialize(self, ):
+        return UpdateQuerySet(self.model, using=self._db)
 
 class Update(models.Model):
     user            = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -14,3 +24,7 @@ class Update(models.Model):
 
     def __str__(self):
         return self.content or ""
+
+    def serialize(self):
+        json_data = serialize("json", [self], fields=('user', 'content', 'image'))
+        return json_data
