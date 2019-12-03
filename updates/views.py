@@ -1,5 +1,10 @@
+import json
+
+from django.core.serializers import serialize
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
+from django.views.generic import View
+from drf_project.mixins import JsonResponseMixin
 
 from .models import Update
 
@@ -7,8 +12,45 @@ from .models import Update
 #     return render() #return JSON data or XML
 
 def update_model_detail_view(request):
+    """
+    URI -- for a REST API
+    GET -- Retrieve
+    """
     data = {
         "count": 100,
         "some": "something",
     }
-    return JsonResponse(data)
+    json_data = json.dumps(data)
+    # return JsonResponse(data)
+    return HttpResponse(json_data, content_type='application/json')
+
+class JsonCBV(View):
+    def get(self, request, *args, **kwargs):
+        data = {
+            "classBasedView" : "yeah!",
+            "thanks":"yeah!!!!",
+        }
+        return JsonResponse(data)
+
+class JsonCBV2(JsonResponseMixin, View):
+    def get(self, request, *args, **kwargs):
+        data = {
+            "classBasedView" : "yeah!",
+            "thanks":"from Json CBV2 yeah!!!!",
+        }
+        return self.render_to_json_response(data)
+
+
+class SerializedDetailView(JsonResponseMixin, View):
+    def get(self, request, *args, **kwargs):
+        obj = Update.objects.get(id=1)
+        data = serialize("json", [obj,], fields=('user', 'timestamp'))
+        json_data = data
+        return HttpResponse(json_data, content_type='application/json')
+
+class SerializedListView(JsonResponseMixin, View):
+    def get(self, request, *args, **kwargs):
+        qs = Update.objects.all()
+        data = serialize("json", qs, fields=('user', 'content'))
+        json_data = data
+        return HttpResponse(json_data, content_type='application/json')
