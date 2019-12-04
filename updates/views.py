@@ -49,6 +49,7 @@ class SerializedDetailView(JsonResponseMixin, View):
 
 class SerializedListView(JsonResponseMixin, View):
     def get(self, request, *args, **kwargs):
-        qs = Update.objects.all()
-        json_data = qs.serialize()
+        # qs = Update.objects.all()
+        # qs = Update.objects.all()
+        json_data = Update.objects.all().serialize()
         return HttpResponse(json_data, content_type='application/json')
