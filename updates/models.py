@@ -1,3 +1,4 @@
+from django.core import serializers
 from django.core.serializers import serialize
 from django.conf import settings
 from django.db import models
@@ -22,9 +23,17 @@ class Update(models.Model):
     updated         = models.DateTimeField(auto_now=True)
     timestamp       = models.DateTimeField(auto_now_add=True)
 
+    objects = UpdateManager()
+
     def __str__(self):
         return self.content or ""
 
     def serialize(self):
         json_data = serialize("json", [self], fields=('user', 'content', 'image'))
         return json_data
+
+#
+# class UpdateSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Update
+#         fields = ("user", "content", "image")

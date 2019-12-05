@@ -8,6 +8,7 @@ from drf_project.mixins import JsonResponseMixin
 
 from .models import Update
 
+
 # def detail_view(request):
 #     return render() #return JSON data or XML
 
@@ -49,7 +50,6 @@ class SerializedDetailView(JsonResponseMixin, View):
 
 class SerializedListView(JsonResponseMixin, View):
     def get(self, request, *args, **kwargs):
-        # qs = Update.objects.all()
-        # qs = Update.objects.all()
-        json_data = Update.objects.all().serialize()
+        qs = Update.objects.all()
+        json_data = serialize("json", qs)
         return HttpResponse(json_data, content_type='application/json')
